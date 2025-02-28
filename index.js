@@ -5,17 +5,20 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Default Puppeteer arguments for running in Docker
+const defaultPuppeteerArgs = ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'];
+let puppeteerArgs = [...defaultPuppeteerArgs];
+
 // Parse command line arguments
 const args = process.argv.slice(2);
-let puppeteerArgs = [];
-
-// Look for --puppeteer-args flag
 const puppeteerArgsIndex = args.findIndex(arg => arg.startsWith('--puppeteer-args='));
 if (puppeteerArgsIndex !== -1) {
     const argsString = args[puppeteerArgsIndex].split('=')[1];
-    puppeteerArgs = argsString.split(',');
-    console.log('Using Puppeteer args:', puppeteerArgs);
+    const additionalArgs = argsString.split(',');
+    puppeteerArgs = [...new Set([...puppeteerArgs, ...additionalArgs])];
 }
+
+console.log('Using Puppeteer args:', puppeteerArgs);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -216,23 +219,27 @@ app.post('/render', (req, res) => {
                 height: 65
             },
             puppeteerConfig: {
-                args: puppeteerArgs.length > 0 ? puppeteerArgs : ['--no-sandbox']
+                args: puppeteerArgs
             }
         };
         
         fs.writeFileSync(configFile, JSON.stringify(config));
         
         // Save code to temporary file
-        fs.writeFileSync(inputFile, mermaidCode);
+    fs.writeFileSync(inputFile, mermaidCode);
 
-        // Execute Mermaid CLI to convert to PNG with sketch theme and higher quality
-        // Use puppeteer scale factor for higher resolution
-        const puppeteerArgsString = puppeteerArgs.length > 0 ? 
-            `--puppeteerArgs ${puppeteerArgs.map(arg => `"${arg}"`).join(' ')}` : 
-            '--puppeteerArgs "--no-sandbox"';
-            
-        exec(`npx mmdc -i ${inputFile} -o ${outputFile} -c ${configFile} -b ${backgroundColor} -w ${width} -H ${height} -s ${scale} ${puppeteerArgsString}`, (error, stdout, stderr) => {
-            if (error) {
+        // Build the command with proper argument formatting
+        let command = `npx mmdc -i ${inputFile} -o ${outputFile} -c ${configFile} -b ${backgroundColor} -w ${width} -H ${height} -s ${scale}`;
+        
+        // Add each puppeteer argument separately
+        puppeteerArgs.forEach(arg => {
+            command += ` --puppeteerArgs "${arg}"`;
+        });
+        
+        console.log('Executing command:', command);
+        
+        exec(command, (error, stdout, stderr) => {
+        if (error) {
                 console.error('Mermaid CLI error:', error);
                 console.error('Stderr:', stderr);
                 cleanupFiles(inputFile, outputFile);
@@ -241,7 +248,7 @@ app.post('/render', (req, res) => {
             }
 
             // Send image to client
-            res.sendFile(outputFile, (err) => {
+        res.sendFile(outputFile, (err) => {
                 if (err) {
                     console.error('Error sending file:', err);
                 }
