@@ -8,12 +8,21 @@ services:
     container_name: mermaid-api
     restart: unless-stopped
     ports:
-      - "${PORT}:3000"
+      - "${PORT:-3000}:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - PUPPETEER_SKIP_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
     volumes:
       - ./output:/usr/src/app/output
+      - ./temp:/usr/src/app/temp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     # Add Chrome flags to make it work in Docker
     command: >
       node index.js --puppeteer-args="--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage" 

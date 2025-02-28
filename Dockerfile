@@ -36,18 +36,38 @@ RUN apt-get update && apt-get install -y \
 # Create app directory
 WORKDIR /usr/src/app
 
+# Set npm configurations to avoid permission issues and improve reliability
+RUN npm config set registry https://registry.npmjs.org/ \
+    && npm config set fetch-retries 5 \
+    && npm config set fetch-retry-mintimeout 20000 \
+    && npm config set fetch-retry-maxtimeout 120000
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install app dependencies
-RUN npm install
-RUN npx puppeteer browsers install chrome-headless-shell
+# Skip Puppeteer download during npm install
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+# Install app dependencies with proper error handling
+RUN npm install --no-optional || (cat npm-debug.log && exit 1)
 
 # Copy app source
 COPY . .
+
+# Create necessary directories with proper permissions
+RUN mkdir -p temp output public \
+    && chmod -R 755 temp output public
+
+# Install Chrome manually
+RUN apt-get update && apt-get install -y chromium \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables for Puppeteer to use the installed Chrome
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Expose port
 EXPOSE 3000
 
 # Start the app
-CMD ["node", "index.js"] 
+CMD ["node", "index.js", "--puppeteer-args=--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage"] 
