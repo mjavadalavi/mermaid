@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رندر دیاگرام‌های Mermaid </title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>رندر دیاگرام‌های Mermaid </h1>
+        
+        <form id="render-form">
+            <div class="form-group">
+                <label for="mermaid-code">کد Mermaid:</label>
+                <textarea id="mermaid-code" name="code" placeholder="کد Mermaid خود را اینجا وارد کنید..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>تنظیمات رندر:</label>
+                <div class="options-container">
+                    <div class="form-group">
+                        <label for="theme">تم:</label>
+                        <select id="theme" name="theme">
+                            <option value="default">پیش‌فرض</option>
+                            <option value="forest">جنگل</option>
+                            <option value="dark">تاریک</option>
+                            <option value="neutral">خنثی</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="width">عرض (پیکسل):</label>
+                        <input type="number" id="width" name="width" value="2000" min="100" max="3000" style="width: 90%;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="height">ارتفاع (پیکسل):</label>
+                        <input type="number" id="height" name="height" value="1400" min="100" max="3000" style="width: 90%;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="scale">مقیاس:</label>
+                        <input type="number" id="scale" name="scale" value="3" min="1" max="5" step="0.5" style="width: 90%;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="background-color">رنگ پس‌زمینه:</label>
+                        <input type="color" id="background-color" name="backgroundColor" value="#ffffff" style="width: 90%;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="font-family">فونت:</label>
+                        <select id="font-family" name="fontFamily">
+                            <option value="B Yekan,San Francisco, Vazirmatn, Tahoma, sans-serif">بی یکان</option>
+                            <option value="Vazirmatn, Tahoma, sans-serif">وزیر متن</option>
+                            <option value="IranSans, sans-serif">ایران سنس</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="font-size">اندازه فونت:</label>
+                        <input type="text" id="font-size" name="fontSize" value="16px" style="width: 90%;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="curve-tension">انحنای خطوط (0.1 تا 1):</label>
+                        <input type="range" id="curve-tension" name="curveTension" min="0" max="1" step="0.1" value="0" style="width: 90%;">
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit">رندر دیاگرام</button>
+        </form>
+        
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>در حال رندر دیاگرام...</p>
+        </div>
+        
+        <div class="error-message" id="error-message"></div>
+        
+        <div class="result-container" id="result-container"></div>
+        
+        <div class="examples">
+            <h3>نمونه‌های آماده:</h3>
+            <div class="example-buttons">
+                <button type="button" class="example-button" data-example="flowchart">فلوچارت ساده</button>
+                <button type="button" class="example-button" data-example="sequence">دیاگرام توالی</button>
+                <button type="button" class="example-button" data-example="class">دیاگرام کلاس</button>
+                <button type="button" class="example-button" data-example="er">دیاگرام ER</button>
+                <button type="button" class="example-button" data-example="gantt">نمودار گانت</button>
+                <button type="button" class="example-button" data-example="persian">مثال فارسی</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>API رندر دیاگرام‌های Mermaid  | نسخه 1.0.0</p>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
+ 

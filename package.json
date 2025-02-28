@@ -1,0 +1,14 @@
+{
+  "name": "mermaid-api",
+  "version": "1.0.0",
+  "description": "API for rendering Mermaid diagrams",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@mermaid-js/mermaid-cli": "^11.4.2",
+    "express": "^4.18.2"
+  }
+}

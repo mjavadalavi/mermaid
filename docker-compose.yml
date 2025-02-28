@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mermaid-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mermaid-api
+    restart: unless-stopped
+    ports:
+      - "${PORT}:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - ./output:/usr/src/app/output
+    # Add Chrome flags to make it work in Docker
+    command: >
+      node index.js --puppeteer-args="--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage" 
