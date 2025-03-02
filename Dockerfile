@@ -33,6 +33,15 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Chrome manually 
+RUN apt-get update && apt-get install -y chromium \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user to run our application
+RUN groupadd -r mermaid && useradd -r -g mermaid -G audio,video mermaid \
+    && mkdir -p /home/mermaid \
+    && chown -R mermaid:mermaid /home/mermaid
+
 # Create app directory
 WORKDIR /usr/src/app
 
@@ -57,14 +66,16 @@ COPY . .
 
 # Create necessary directories with proper permissions
 RUN mkdir -p temp output public \
-    && chmod -R 755 temp output public
-
-# Install Chrome manually
-RUN apt-get update && apt-get install -y chromium \
-    && rm -rf /var/lib/apt/lists/*
+    && chmod -R 777 temp output public
 
 # Set environment variables for Puppeteer to use the installed Chrome
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+# Change ownership of all application files to non-root user
+RUN chown -R mermaid:mermaid /usr/src/app
+
+# Switch to non-root user
+USER mermaid
 
 # Expose port
 EXPOSE 3000

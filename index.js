@@ -226,29 +226,36 @@ app.post('/render', (req, res) => {
         fs.writeFileSync(configFile, JSON.stringify(config));
         
         // Save code to temporary file
-    fs.writeFileSync(inputFile, mermaidCode);
+        fs.writeFileSync(inputFile, mermaidCode);
 
-        // Build the command with proper argument formatting
-        let command = `npx mmdc -i ${inputFile} -o ${outputFile} -c ${configFile} -b ${backgroundColor} -w ${width} -H ${height} -s ${scale}`;
+        // Format puppeteer arguments as a single string for the CLI
+        const puppeteerArgsString = puppeteerArgs.join(',');
         
-        // Add each puppeteer argument separately
-        puppeteerArgs.forEach(arg => {
-            command += ` --puppeteerArgs "${arg}"`;
-        });
+        // Construct the command with a single puppeteerArgs parameter
+        const command = `npx mmdc -i "${inputFile}" -o "${outputFile}" -c "${configFile}" -b "${backgroundColor}" -w ${width} -H ${height} -s ${scale} --puppeteerArgs="${puppeteerArgsString}"`;
         
         console.log('Executing command:', command);
         
-        exec(command, (error, stdout, stderr) => {
-        if (error) {
+        // Execute with proper environment variables
+        const env = {
+            ...process.env,
+            PUPPETEER_EXECUTABLE_PATH: '/usr/bin/chromium'
+        };
+        
+        exec(command, { env }, (error, stdout, stderr) => {
+            if (error) {
                 console.error('Mermaid CLI error:', error);
                 console.error('Stderr:', stderr);
+                if (stderr.includes('Running as root without --no-sandbox')) {
+                    console.error('Root user detected - this is a permissions issue with Chrome.');
+                }
                 cleanupFiles(inputFile, outputFile);
                 cleanupFiles(configFile, null);
                 return res.status(500).json({ error: 'Error rendering Mermaid code' });
             }
 
             // Send image to client
-        res.sendFile(outputFile, (err) => {
+            res.sendFile(outputFile, (err) => {
                 if (err) {
                     console.error('Error sending file:', err);
                 }
