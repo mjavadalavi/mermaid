@@ -228,9 +228,18 @@ app.post('/render', (req, res) => {
         // Save code to temporary file
         fs.writeFileSync(inputFile, mermaidCode);
 
-        // The correct format for puppeteer arguments in mermaid-cli
-        // mermaid-cli uses -p or --puppeteer option
-        const command = `npx mmdc -i "${inputFile}" -o "${outputFile}" -c "${configFile}" -b "${backgroundColor}" -w ${width} -H ${height} -s ${scale}`;
+        // Try a different approach for passing puppeteer arguments
+        // First, create a puppeteer config file
+        const puppeteerConfigFile = path.join(tempDir, `puppeteer_${timestamp}.json`);
+        const puppeteerConfig = {
+            args: puppeteerArgs
+        };
+        fs.writeFileSync(puppeteerConfigFile, JSON.stringify(puppeteerConfig));
+
+        // Use the puppeteer config file with the -p option
+        // Format the puppeteer args as a JSON string for the -p option
+        const puppeteerConfigStr = JSON.stringify({ args: puppeteerArgs }).replace(/"/g, '\\"');
+        const command = `npx mmdc -i "${inputFile}" -o "${outputFile}" -c "${configFile}" -b "${backgroundColor}" -w ${width} -H ${height} -s ${scale} -p "${puppeteerConfigStr}"`;
         
         console.log('Executing command:', command);
         

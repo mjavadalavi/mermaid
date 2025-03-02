@@ -24,5 +24,4 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    command: >
-      bash -c "chmod -R 777 /usr/src/app/temp /usr/src/app/output && node index.js" 
+    command: node index.js 
