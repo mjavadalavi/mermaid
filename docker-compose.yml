@@ -25,4 +25,4 @@ services:
       retries: 3
       start_period: 10s
     command: >
-      bash -c "chmod -R 777 /usr/src/app/temp /usr/src/app/output && node index.js --puppeteer-args=\"--no-sandbox\" --puppeteer-args=\"--disable-setuid-sandbox\" --puppeteer-args=\"--disable-dev-shm-usage\"" 
+      bash -c "chmod -R 777 /usr/src/app/temp /usr/src/app/output && node index.js" 

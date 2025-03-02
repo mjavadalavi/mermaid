@@ -72,5 +72,5 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 # Expose port
 EXPOSE 3000
 
-# Start the app with properly formatted puppeteer arguments
-CMD ["node", "index.js", "--puppeteer-args=--no-sandbox", "--puppeteer-args=--disable-setuid-sandbox", "--puppeteer-args=--disable-dev-shm-usage"] 
+# Start the app 
+CMD ["node", "index.js"] 
