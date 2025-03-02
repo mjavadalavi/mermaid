@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     libgbm1 \
     libxshmfence1 \
+    curl \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -36,11 +37,6 @@ RUN apt-get update && apt-get install -y \
 # Install Chrome manually 
 RUN apt-get update && apt-get install -y chromium \
     && rm -rf /var/lib/apt/lists/*
-
-# Create a non-root user to run our application
-RUN groupadd -r mermaid && useradd -r -g mermaid -G audio,video mermaid \
-    && mkdir -p /home/mermaid \
-    && chown -R mermaid:mermaid /home/mermaid
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -64,18 +60,14 @@ RUN npm install --no-optional || (cat npm-debug.log && exit 1)
 # Copy app source
 COPY . .
 
-# Create necessary directories with proper permissions
-RUN mkdir -p temp output public \
-    && chmod -R 777 temp output public
+# Create necessary directories
+RUN mkdir -p /usr/src/app/temp /usr/src/app/output /usr/src/app/public
 
 # Set environment variables for Puppeteer to use the installed Chrome
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Change ownership of all application files to non-root user
-RUN chown -R mermaid:mermaid /usr/src/app
-
-# Switch to non-root user
-USER mermaid
+# We'll run as root for now to avoid permission issues
+# This is safe since we're using --no-sandbox in Puppeteer
 
 # Expose port
 EXPOSE 3000

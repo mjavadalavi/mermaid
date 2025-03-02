@@ -24,6 +24,5 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    # Add Chrome flags to make it work in Docker
     command: >
-      node index.js --puppeteer-args="--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage" 
+      bash -c "chmod -R 777 /usr/src/app/temp /usr/src/app/output && node index.js --puppeteer-args=\"--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage\"" 
