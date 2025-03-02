@@ -230,7 +230,7 @@ app.post('/render', (req, res) => {
 
         // The correct format for puppeteer arguments in mermaid-cli
         // mermaid-cli uses -p or --puppeteer option
-        const command = `npx mmdc -i "${inputFile}" -o "${outputFile}" -c "${configFile}" -b "${backgroundColor}" -w ${width} -H ${height} -s ${scale}"`;
+        const command = `npx mmdc -i "${inputFile}" -o "${outputFile}" -c "${configFile}" -b "${backgroundColor}" -w ${width} -H ${height} -s ${scale}`;
         
         console.log('Executing command:', command);
         
