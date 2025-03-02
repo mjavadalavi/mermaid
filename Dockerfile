@@ -66,14 +66,8 @@ RUN mkdir -p /usr/src/app/temp /usr/src/app/output /usr/src/app/public
 # Set environment variables for Puppeteer to use the installed Chrome
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# We'll run as root for now to avoid permission issues
-# This is safe since we're using --no-sandbox in Puppeteer
-
-# Create a non-root user for running the application
-RUN groupadd -r mermaid && useradd -r -g mermaid -G audio,video mermaid \
-    && mkdir -p /home/mermaid \
-    && chown -R mermaid:mermaid /home/mermaid \
-    && chown -R mermaid:mermaid /usr/src/app
+# We'll run as root since we're using --no-sandbox in Puppeteer
+# This is safe in a container environment with proper security measures
 
 # Make sure the chromium executable is accessible
 RUN chmod 755 /usr/bin/chromium
@@ -84,9 +78,6 @@ RUN mkdir -p /usr/src/app/temp /usr/src/app/output \
 
 # Expose port
 EXPOSE 3000
-
-# Switch to non-root user
-USER mermaid
 
 # Start the app 
 CMD ["node", "index.js"] 

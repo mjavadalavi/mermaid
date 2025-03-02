@@ -237,9 +237,7 @@ app.post('/render', (req, res) => {
         fs.writeFileSync(puppeteerConfigFile, JSON.stringify(puppeteerConfig));
 
         // Use the puppeteer config file with the -p option
-        // Format the puppeteer args as a JSON string for the -p option
-        const puppeteerConfigStr = JSON.stringify({ args: puppeteerArgs }).replace(/"/g, '\\"');
-        const command = `npx mmdc -i "${inputFile}" -o "${outputFile}" -c "${configFile}" -b "${backgroundColor}" -w ${width} -H ${height} -s ${scale} -p "${puppeteerConfigStr}"`;
+        const command = `npx mmdc -i "${inputFile}" -o "${outputFile}" -c "${configFile}" -b "${backgroundColor}" -w ${width} -H ${height} -s ${scale} -p "${puppeteerConfigFile}"`;
         
         console.log('Executing command:', command);
         
