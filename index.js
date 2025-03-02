@@ -228,11 +228,13 @@ app.post('/render', (req, res) => {
         // Save code to temporary file
         fs.writeFileSync(inputFile, mermaidCode);
 
-        // Format puppeteer arguments as a single string for the CLI
-        const puppeteerArgsString = puppeteerArgs.join(',');
+        // Format puppeteer arguments for the CLI - each argument needs to be passed separately
+        let command = `npx mmdc -i "${inputFile}" -o "${outputFile}" -c "${configFile}" -b "${backgroundColor}" -w ${width} -H ${height} -s ${scale}`;
         
-        // Construct the command with a single puppeteerArgs parameter
-        const command = `npx mmdc -i "${inputFile}" -o "${outputFile}" -c "${configFile}" -b "${backgroundColor}" -w ${width} -H ${height} -s ${scale} --puppeteerArgs="${puppeteerArgsString}"`;
+        // Add puppeteer args one by one
+        puppeteerArgs.forEach(arg => {
+            command += ` --puppeteerArgs "${arg}"`;
+        });
         
         console.log('Executing command:', command);
         
